@@ -1,0 +1,52 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-radius: 1rem;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.auth-options {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.auth-options .divider {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #777;
+  position: relative;
+}
+
+.auth-options .divider::before,
+.auth-options .divider::after {
+  content: "";
+  display: inline-block;
+  width: 30%;
+  height: 1px;
+  background-color: #ccc;
+  vertical-align: middle;
+  margin: 0 10px;
+}
+
+.auth-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
