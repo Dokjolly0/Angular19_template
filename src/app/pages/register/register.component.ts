@@ -25,6 +25,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { gitHubSVG } from '../../svg/github.svg';
 import { googleSVG } from '../../svg/google.svg';
 import { environment } from '../../../environments/environment';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageUploadDialog } from '../../components/image-upload-dialog/image-upload-dialog.component';
 
 @Component({
   selector: 'app-register',
@@ -50,6 +52,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private destroyed$ = new Subject<void>();
   private sanitizer = inject(DomSanitizer);
+  private dialog = inject(MatDialog);
 
   registerForm: FormGroup = new FormGroup({});
   genderOptions = genderOptions;
@@ -76,6 +79,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  openImageDialog(): void {
+    const dialogRef = this.dialog.open(ImageUploadDialog, {
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.previewImage = result;
+        this.registerForm.get('picture')?.setValue(result);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -126,11 +142,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     };
   }
 
-  loginWithGoogle(): void {
+  registerWithGoogle(): void {
     window.location.href = `${environment.googleAuthLink}`;
   }
 
-  loginWithGithub(): void {
+  registerWithGithub(): void {
     window.location.href = `${environment.gitHubAuthLink}`;
   }
 

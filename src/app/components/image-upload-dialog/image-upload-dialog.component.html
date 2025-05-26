@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Seleziona immagine</h2>
+<mat-dialog-content>
+  <mat-radio-group [(ngModel)]="mode">
+    <mat-radio-button value="url">Da URL</mat-radio-button>
+    <mat-radio-button value="file">Da File</mat-radio-button>
+  </mat-radio-group>
+
+  <div *ngIf="mode === 'url'" class="field">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>URL immagine</mat-label>
+      <input matInput [(ngModel)]="url" (input)="updatePreview()" />
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="mode === 'file'" class="field">
+    <input type="file" (change)="onFileSelected($event)" />
+  </div>
+
+  <div *ngIf="previewImage" class="preview">
+    <img [src]="previewImage" alt="Preview" width="150" />
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Annulla</button>
+  <button mat-raised-button color="primary" (click)="confirm()">
+    Conferma
+  </button>
+</mat-dialog-actions>

@@ -1,6 +1,5 @@
-Hai detto:
-<div class="login-container">
-  <mat-card class="login-card">
+<div class="register-container">
+  <mat-card class="register-card">
     <mat-card-header>
       <mat-card-title>Registrati</mat-card-title>
     </mat-card-header>
@@ -60,39 +59,19 @@ Hai detto:
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Metodo caricamento immagine</mat-label>
-            <mat-select [(value)]="pictureMode">
-              <mat-option value="url">Da URL</mat-option>
-              <mat-option value="file">Da file</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div class="form-field image-upload-link">
+            <button
+              mat-button
+              type="button"
+              color="accent"
+              class="upload-link"
+              (click)="openImageDialog()"
+            >
+              <mat-icon inline>cloud_upload</mat-icon>
+              Carica immagine
+            </button>
+          </div>
 
-          <!-- Campo immagine da URL -->
-          <ng-container *ngIf="pictureMode === 'url'">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>URL immagine</mat-label>
-              <input
-                matInput
-                formControlName="picture"
-                (input)="updatePreviewFromUrl()"
-              />
-            </mat-form-field>
-          </ng-container>
-
-          <!-- Campo immagine da file -->
-          <ng-container *ngIf="pictureMode === 'file'">
-            <div class="form-field upload-field">
-              <label for="fileInput">Carica immagine</label>
-              <input
-                id="fileInput"
-                type="file"
-                (change)="onFileSelected($event)"
-              />
-            </div>
-          </ng-container>
-
-          <!-- Preview -->
           <div *ngIf="previewImage" class="form-field">
             <img [src]="previewImage" alt="Anteprima immagine" width="150" />
           </div>
@@ -123,7 +102,7 @@ Hai detto:
             mat-stroked-button
             color="warn"
             class="auth-btn"
-            (click)="loginWithGoogle()"
+            (click)="registerWithGoogle()"
             type="button"
           >
             <span [innerHTML]="googleSVG(24)"></span>
@@ -134,7 +113,7 @@ Hai detto:
             mat-stroked-button
             color="accent"
             class="auth-btn"
-            (click)="loginWithGithub()"
+            (click)="registerWithGithub()"
             type="button"
           >
             <span [innerHTML]="gitHubSVG(24)"></span>
