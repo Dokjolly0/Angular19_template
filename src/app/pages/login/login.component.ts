@@ -97,11 +97,11 @@ export class LoginComponent {
   }
 
   loginWithGoogle(): void {
-    window.location.href = `${environment.apiUrl}/auth/google`;
+    window.location.href = `${environment.googleAuthLink}`;
   }
 
   loginWithGithub(): void {
-    window.location.href = `${environment.apiUrl}/auth/github`;
+    window.location.href = `${environment.gitHubAuthLink}`;
   }
 
   // Restituisce l'SVG di Google come HTML "sicuro"
