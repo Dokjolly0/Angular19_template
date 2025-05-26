@@ -1,3 +1,3 @@
 export interface SVGProps {
-  pixel: string;
+  pixel: number;
 }

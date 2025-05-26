@@ -106,11 +106,11 @@ export class LoginComponent {
 
   // Restituisce l'SVG di Google come HTML "sicuro"
   googleSVG(pixel: number): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(googleSVG(`${pixel}`));
+    return this.sanitizer.bypassSecurityTrustHtml(googleSVG(pixel));
   }
 
   gitHubSVG(pixel: number): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(gitHubSVG(`${pixel}`));
+    return this.sanitizer.bypassSecurityTrustHtml(gitHubSVG(pixel));
   }
 
   // Pulizia memory leak su destroy del componente
