@@ -13,7 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { catchError, Subject, takeUntil, throwError } from 'rxjs';
@@ -30,6 +30,7 @@ import { gitHubSVG } from '../../svg/github.svg';
   styleUrls: ['./login.component.css'],
   imports: [
     CommonModule,
+    RouterModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -40,9 +41,8 @@ import { gitHubSVG } from '../../svg/github.svg';
   ],
 })
 export class LoginComponent {
-  // Reactive FormGroup per il login
-  loginForm: FormGroup = new FormGroup({});
-
+  loginError = '';
+  loginForm: FormGroup = new FormGroup({}); // Reactive FormGroup
   // Subject per pulire gli observable in ngOnDestroy (best practice)
   private destroyed$ = new Subject<void>();
 
@@ -52,8 +52,6 @@ export class LoginComponent {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private sanitizer = inject(DomSanitizer);
-
-  loginError = '';
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({

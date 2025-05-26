@@ -1,1 +1,147 @@
-<p>register works!</p>
+Hai detto:
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Registrati</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="registerForm" (ngSubmit)="register()">
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nome</mat-label>
+            <input matInput formControlName="firstname" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Cognome</mat-label>
+            <input matInput formControlName="lastname" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="username" type="email" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              formControlName="password"
+              type="password"
+              required
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Conferma Password</mat-label>
+            <input
+              matInput
+              formControlName="checkpassword"
+              type="password"
+              required
+            />
+            <mat-error *ngIf="registerForm.hasError('passwordMismatch')">
+              Le password non corrispondono
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Data di nascita (opzionale)</mat-label>
+            <input matInput formControlName="birthDate" type="date" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Genere (opzionale)</mat-label>
+            <mat-select formControlName="gender">
+              <mat-option *ngFor="let g of genderOptions" [value]="g">{{
+                g
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Metodo caricamento immagine</mat-label>
+            <mat-select [(value)]="pictureMode">
+              <mat-option value="url">Da URL</mat-option>
+              <mat-option value="file">Da file</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Campo immagine da URL -->
+          <ng-container *ngIf="pictureMode === 'url'">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>URL immagine</mat-label>
+              <input
+                matInput
+                formControlName="picture"
+                (input)="updatePreviewFromUrl()"
+              />
+            </mat-form-field>
+          </ng-container>
+
+          <!-- Campo immagine da file -->
+          <ng-container *ngIf="pictureMode === 'file'">
+            <div class="form-field upload-field">
+              <label for="fileInput">Carica immagine</label>
+              <input
+                id="fileInput"
+                type="file"
+                (change)="onFileSelected($event)"
+              />
+            </div>
+          </ng-container>
+
+          <!-- Preview -->
+          <div *ngIf="previewImage" class="form-field">
+            <img [src]="previewImage" alt="Anteprima immagine" width="150" />
+          </div>
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width"
+        >
+          Registrati
+        </button>
+
+        <div class="auth-options">
+          <a
+            routerLink="/login"
+            mat-stroked-button
+            color="accent"
+            class="full-width"
+          >
+            Hai già un account? Accedi
+          </a>
+
+          <div class="divider">oppure</div>
+
+          <button
+            mat-stroked-button
+            color="warn"
+            class="auth-btn"
+            (click)="loginWithGoogle()"
+            type="button"
+          >
+            <span [innerHTML]="googleSVG(24)"></span>
+            Accedi con Google
+          </button>
+
+          <button
+            mat-stroked-button
+            color="accent"
+            class="auth-btn"
+            (click)="loginWithGithub()"
+            type="button"
+          >
+            <span [innerHTML]="gitHubSVG(24)"></span>
+            Accedi con GitHub
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
