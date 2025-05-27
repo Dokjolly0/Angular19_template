@@ -13,10 +13,12 @@
   </div>
 
   <div *ngIf="mode === 'file'" class="field">
-    <input type="file" (change)="onFileSelected($event)" />
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
   </div>
 
-  <div *ngIf="previewImage" class="preview">
+  <mat-error *ngIf="fileError">{{ fileError }}</mat-error>
+
+  <div *ngIf="previewImage && !fileError" class="preview">
     <img [src]="previewImage" alt="Preview" width="150" />
   </div>
 </mat-dialog-content>

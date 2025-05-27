@@ -19,6 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { genderOptions } from '../../const/gender';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -42,6 +43,7 @@ import { ImageUploadDialog } from '../../components/image-upload-dialog/image-up
     MatSnackBarModule,
     MatIconModule,
     MatSelectModule,
+    MatTooltipModule,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
@@ -59,6 +61,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   previewImage: string | null = null;
   selectedImageFile: File | null = null;
   pictureMode: 'url' | 'file' = 'url';
+  hidePassword = true;
+  hideConfirmPassword = true;
+  uploadedFileName: string = '';
 
   updatePreviewFromUrl(): void {
     const url = this.registerForm.get('picture')?.value;
@@ -90,8 +95,20 @@ export class RegisterComponent implements OnInit, OnDestroy {
       if (result) {
         this.previewImage = result;
         this.registerForm.get('picture')?.setValue(result);
+
+        this.uploadedFileName = result.startsWith('data:image')
+          ? 'Immagine da file'
+          : this.extractFilenameFromUrl(result);
       }
     });
+  }
+
+  extractFilenameFromUrl(url: string): string {
+    try {
+      return url.split('/').pop()?.split('?')[0] ?? 'Immagine da URL';
+    } catch {
+      return 'Immagine da URL';
+    }
   }
 
   ngOnInit(): void {
@@ -116,6 +133,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         // resetto eventuali messaggi di errore
       });
+  }
+
+  togglePasswordVisibility(isConfirmPassword: boolean = false) {
+    if (!isConfirmPassword) this.hidePassword = !this.hidePassword;
+    else this.hideConfirmPassword = !this.hideConfirmPassword;
   }
 
   register(): void {

@@ -30,27 +30,49 @@ export class ImageUploadDialog {
   url: string = '';
   previewImage: string | null = null;
   selectedFile: File | null = null;
+  fileError: string | null = null;
 
   constructor(private dialogRef: MatDialogRef<ImageUploadDialog>) {}
 
   updatePreview(): void {
-    this.previewImage = this.url || null;
+    if (this.isValidImageUrl(this.url)) {
+      this.previewImage = this.url;
+    } else {
+      this.previewImage = null;
+    }
+  }
+
+  isValidImageUrl(url: string): boolean {
+    return /\.(jpeg|jpg|gif|png|bmp|webp|svg)$/i.test(url);
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
+      const file = input.files[0];
+      this.fileError = null;
+
+      if (!file.type.startsWith('image/')) {
+        this.previewImage = null;
+        this.fileError = "Il file selezionato non è un'immagine valida.";
+        return;
+      }
+
+      this.selectedFile = file;
       const reader = new FileReader();
       reader.onload = () => {
         this.previewImage = reader.result as string;
       };
-      reader.readAsDataURL(this.selectedFile);
+      reader.readAsDataURL(file);
     }
   }
 
   confirm(): void {
-    this.dialogRef.close(this.previewImage); // restituisci la stringa base64 o url
+    if (!this.previewImage || this.fileError) {
+      this.fileError = this.fileError || 'Nessuna immagine valida selezionata.';
+      return;
+    }
+    this.dialogRef.close(this.previewImage);
   }
 
   close(): void {

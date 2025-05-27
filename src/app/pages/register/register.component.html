@@ -27,9 +27,12 @@
             <input
               matInput
               formControlName="password"
-              type="password"
+              [type]="hidePassword ? 'password' : 'text'"
               required
             />
+            <mat-icon matSuffix (click)="togglePasswordVisibility()"
+              >visibility</mat-icon
+            >
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
@@ -38,8 +41,12 @@
               matInput
               formControlName="checkpassword"
               type="password"
+              [type]="hideConfirmPassword ? 'password' : 'text'"
               required
             />
+            <mat-icon matSuffix (click)="togglePasswordVisibility(true)"
+              >visibility</mat-icon
+            >
             <mat-error *ngIf="registerForm.hasError('passwordMismatch')">
               Le password non corrispondono
             </mat-error>
@@ -59,22 +66,33 @@
             </mat-select>
           </mat-form-field>
 
-          <div class="form-field image-upload-link">
-            <button
-              mat-button
-              type="button"
-              color="accent"
-              class="upload-link"
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Immagine (opzionale)</mat-label>
+            <input
+              matInput
+              [value]="uploadedFileName || 'Nessuna immagine caricata'"
+              readonly
               (click)="openImageDialog()"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              [matTooltip]="
+                uploadedFileName ? 'Immagine caricata' : 'Carica immagine'
+              "
+              [color]="uploadedFileName ? 'primary' : ''"
+              (click)="openImageDialog()"
+              type="button"
             >
-              <mat-icon inline>cloud_upload</mat-icon>
-              Carica immagine
+              <mat-icon>{{
+                uploadedFileName ? "check_circle" : "cloud_upload"
+              }}</mat-icon>
             </button>
-          </div>
+          </mat-form-field>
 
-          <div *ngIf="previewImage" class="form-field">
+          <!-- <div *ngIf="previewImage" class="form-field">
             <img [src]="previewImage" alt="Anteprima immagine" width="150" />
-          </div>
+          </div> -->
         </div>
 
         <button
