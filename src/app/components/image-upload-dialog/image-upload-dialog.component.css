@@ -5,3 +5,16 @@
   margin-top: 1rem;
   text-align: center;
 }
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+
+.drop-zone.dragging {
+  background-color: #f0f0f0;
+}

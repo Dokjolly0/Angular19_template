@@ -1,4 +1,5 @@
 <h2 mat-dialog-title>Seleziona immagine</h2>
+
 <mat-dialog-content>
   <mat-radio-group [(ngModel)]="mode">
     <mat-radio-button value="url">Da URL</mat-radio-button>
@@ -8,20 +9,36 @@
   <div *ngIf="mode === 'url'" class="field">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>URL immagine</mat-label>
-      <input matInput [(ngModel)]="url" (input)="updatePreview()" />
+      <input matInput [(ngModel)]="url" (ngModelChange)="onImageUrlChange()" />
     </mat-form-field>
   </div>
 
-  <div *ngIf="mode === 'file'" class="field">
-    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+  <div
+    *ngIf="mode === 'file'"
+    class="field drop-zone"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    [class.dragging]="isDragging"
+    (click)="fileInput.click()"
+  >
+    <p>Trascina un'immagine qui o clicca per selezionare</p>
+    <input type="file" accept="image/*" #fileInput hidden (change)="onFileSelected($event)" />
   </div>
 
   <mat-error *ngIf="fileError">{{ fileError }}</mat-error>
 
-  <div *ngIf="previewImage && !fileError" class="preview">
-    <img [src]="previewImage" alt="Preview" width="150" />
+  <div *ngIf="previewImage" class="preview">
+    <img
+      [src]="previewImage"
+      alt="Anteprima immagine"
+      width="150"
+      (load)="onImageLoad()"
+      (error)="onImageError()"
+    />
   </div>
 </mat-dialog-content>
+
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()">Annulla</button>
   <button mat-button (click)="delete()">Cancella immagine</button>

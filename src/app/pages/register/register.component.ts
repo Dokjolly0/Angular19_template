@@ -116,6 +116,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+
       if (result === 'delete') {
         this.previewImage = null;
         this.selectedImageFile = null;
@@ -124,13 +126,21 @@ export class RegisterComponent implements OnInit, OnDestroy {
         return;
       }
 
-      if (result) {
-        this.previewImage = result;
-        this.registerForm.get('picture')?.setValue(result);
+      if (result.type === 'url') {
+        this.previewImage = result.data;
+        this.registerForm.get('picture')?.setValue(result.data);
+        this.uploadedFileName = this.extractFilenameFromUrl(result.data);
+      } else if (result.type === 'file') {
+        this.selectedImageFile = result.data;
 
-        this.uploadedFileName = result.startsWith('data:image')
-          ? 'Immagine da file'
-          : this.extractFilenameFromUrl(result);
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.previewImage = reader.result as string;
+        };
+        reader.readAsDataURL(result.data);
+
+        this.registerForm.get('picture')?.setValue(result.data);
+        this.uploadedFileName = result.data.name;
       }
     });
   }
@@ -181,42 +191,55 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   // Registration method
   register(): void {
-    if (this.registerForm.valid || true) {
-      // get data
-      const user = this.registerForm.value;
-      user.birthDate = user.birthDate ? user.birthDate.toISOString() : null;
-      console.log('Dati di registrazione:', user);
-
-      // Register
-      // this.authsrv
-      //   .register(user)
-      //   .pipe(
-      //     takeUntil(this.destroyed$),
-      //     catchError((err) => {
-      //       this.registerError =
-      //         err?.error?.message || 'Errore di registrazione';
-      //       this.snackBar.open(this.registerError, 'Chiudi', {
-      //         duration: 3000,
-      //       });
-      //       return throwError(() => err);
-      //     })
-      //   )
-      //   .subscribe(() => {
-      //     this.snackBar.open('Registrazione completata!', 'Chiudi', {
-      //       duration: 3000,
-      //     });
-      //     this.router.navigate(['/login']);
-      //   });
-
-      // this.snackBar.open('Registrazione completata!', 'Chiudi', {
-      //   duration: 3000,
-      // });
-      // this.router.navigate(['/login']);
-    } else {
-      this.snackBar.open('Controlla tutti i campi obbligatori', 'Chiudi', {
-        duration: 3000,
-      });
+    if (!this.registerForm.valid) {
+      this.snackBar.open('Controlla tutti i campi obbligatori', 'Chiudi', { duration: 3000 });
+      return;
     }
+
+    const formData = new FormData();
+    const formValues = this.registerForm.value;
+
+    for (const key in formValues) {
+      if (key !== 'picture') {
+        formData.append(key, formValues[key]);
+      }
+    }
+
+    if (this.selectedImageFile) {
+      formData.append('picture', this.selectedImageFile);
+    } else if (formValues.picture) {
+      formData.append('pictureUrl', formValues.picture); // se è URL
+    }
+
+    // const user = this.registerForm.value;
+    // user.birthDate = user.birthDate ? user.birthDate.toISOString() : null;
+    console.log('Dati di registrazione:', formValues);
+
+    // Register
+    // this.authsrv
+    //   .register(user)
+    //   .pipe(
+    //     takeUntil(this.destroyed$),
+    //     catchError((err) => {
+    //       this.registerError =
+    //         err?.error?.message || 'Errore di registrazione';
+    //       this.snackBar.open(this.registerError, 'Chiudi', {
+    //         duration: 3000,
+    //       });
+    //       return throwError(() => err);
+    //     })
+    //   )
+    //   .subscribe(() => {
+    //     this.snackBar.open('Registrazione completata!', 'Chiudi', {
+    //       duration: 3000,
+    //     });
+    //     this.router.navigate(['/login']);
+    //   });
+
+    // this.snackBar.open('Registrazione completata!', 'Chiudi', {
+    //   duration: 3000,
+    // });
+    // this.router.navigate(['/login']);
   }
 
   //OAuth methods
