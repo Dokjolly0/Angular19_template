@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { JwtService } from './jwt.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { UserRegistration } from '../interfaces/user.registration';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +36,14 @@ export class AuthService {
         tap((res) => this._currentUser$.next(res.user)),
         map((res) => res.user)
       );
+  }
+
+  register(user: Partial<UserRegistration>) {
+    return this.http
+      .post<{ newUser: User; message: string }>(`${this.url}/register`, {
+        user,
+      })
+      .pipe(map((res) => res.newUser));
   }
 
   logout() {

@@ -6,6 +6,10 @@
   background: linear-gradient(135deg, #e3f2fd, #bbdefb);
 }
 
+.register-content {
+  margin-top: 1.5rem;
+}
+
 .register-card {
   width: 100%;
   max-width: 600px;

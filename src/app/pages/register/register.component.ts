@@ -1,49 +1,65 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+//  Angular Core & Common
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+// Angular Forms
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
-  Validators,
   ReactiveFormsModule,
-  AbstractControl,
   ValidationErrors,
   ValidatorFn,
+  Validators,
 } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Subject, takeUntil } from 'rxjs';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatCardModule } from '@angular/material/card';
+
+// Angular Router
+import { Router, RouterModule } from '@angular/router';
+
+// Angular Material
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterModule } from '@angular/router';
+
+// RxJS
+import { Subject, catchError, takeUntil, throwError } from 'rxjs';
+
+// Custom Components and Services
+import { environment } from '../../../environments/environment';
 import { genderOptions } from '../../const/gender';
+import { ImageUploadDialog } from '../../components/image-upload-dialog/image-upload-dialog.component';
+import { AuthService } from '../../services/auth.service';
+
+// Angular Platform Browser
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { gitHubSVG } from '../../svg/github.svg';
 import { googleSVG } from '../../svg/google.svg';
-import { environment } from '../../../environments/environment';
-import { MatDialog } from '@angular/material/dialog';
-import { ImageUploadDialog } from '../../components/image-upload-dialog/image-upload-dialog.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatCardModule,
     MatButtonModule,
-    MatSnackBarModule,
+    MatCardModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
+    MatNativeDateModule,
     MatSelectModule,
+    MatSnackBarModule,
     MatTooltipModule,
+    ReactiveFormsModule,
+    RouterModule,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
@@ -55,6 +71,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private destroyed$ = new Subject<void>();
   private sanitizer = inject(DomSanitizer);
   private dialog = inject(MatDialog);
+  private authsrv = inject(AuthService);
 
   registerForm: FormGroup = new FormGroup({});
   genderOptions = genderOptions;
@@ -64,7 +81,61 @@ export class RegisterComponent implements OnInit, OnDestroy {
   hidePassword = true;
   hideConfirmPassword = true;
   uploadedFileName: string = '';
+  registerError: string = '';
 
+  ngOnInit(): void {
+    this.registerForm = this.fb.group(
+      {
+        firstname: ['', Validators.required],
+        lastname: ['', Validators.required],
+        username: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        checkpassword: ['', Validators.required],
+        picture: [''],
+        birthDate: [''],
+        gender: [''],
+      },
+      {
+        validators: [this.matchPasswordsValidator()],
+      }
+    );
+
+    this.registerForm.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+      // resetto eventuali messaggi di errore
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
+  openImageDialog(): void {
+    const dialogRef = this.dialog.open(ImageUploadDialog, {
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'delete') {
+        this.previewImage = null;
+        this.selectedImageFile = null;
+        this.registerForm.get('picture')?.setValue('');
+        this.uploadedFileName = '';
+        return;
+      }
+
+      if (result) {
+        this.previewImage = result;
+        this.registerForm.get('picture')?.setValue(result);
+
+        this.uploadedFileName = result.startsWith('data:image')
+          ? 'Immagine da file'
+          : this.extractFilenameFromUrl(result);
+      }
+    });
+  }
+
+  // Picture
   updatePreviewFromUrl(): void {
     const url = this.registerForm.get('picture')?.value;
     this.previewImage = url || null;
@@ -86,23 +157,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
-  openImageDialog(): void {
-    const dialogRef = this.dialog.open(ImageUploadDialog, {
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.previewImage = result;
-        this.registerForm.get('picture')?.setValue(result);
-
-        this.uploadedFileName = result.startsWith('data:image')
-          ? 'Immagine da file'
-          : this.extractFilenameFromUrl(result);
-      }
-    });
-  }
-
   extractFilenameFromUrl(url: string): string {
     try {
       return url.split('/').pop()?.split('?')[0] ?? 'Immagine da URL';
@@ -111,49 +165,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
-    this.registerForm = this.fb.group(
-      {
-        firstname: ['', Validators.required],
-        lastname: ['', Validators.required],
-        username: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        checkpassword: ['', Validators.required],
-        picture: [''],
-        birthDate: [''],
-        gender: [''],
-      },
-      {
-        validators: [this.matchPasswordsValidator()],
-      }
-    );
-
-    this.registerForm.valueChanges
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => {
-        // resetto eventuali messaggi di errore
-      });
-  }
-
+  // Password visibility toggle
   togglePasswordVisibility(isConfirmPassword: boolean = false) {
     if (!isConfirmPassword) this.hidePassword = !this.hidePassword;
     else this.hideConfirmPassword = !this.hideConfirmPassword;
-  }
-
-  register(): void {
-    if (this.registerForm.valid) {
-      const user = this.registerForm.value;
-      // TODO: invia `user` al tuo AuthService/register API
-
-      this.snackBar.open('Registrazione completata!', 'Chiudi', {
-        duration: 3000,
-      });
-      this.router.navigate(['/login']);
-    } else {
-      this.snackBar.open('Controlla tutti i campi obbligatori', 'Chiudi', {
-        duration: 3000,
-      });
-    }
   }
 
   matchPasswordsValidator(): ValidatorFn {
@@ -164,6 +179,47 @@ export class RegisterComponent implements OnInit, OnDestroy {
     };
   }
 
+  // Registration method
+  register(): void {
+    if (this.registerForm.valid || true) {
+      // get data
+      const user = this.registerForm.value;
+      user.birthDate = user.birthDate ? user.birthDate.toISOString() : null;
+      console.log('Dati di registrazione:', user);
+
+      // Register
+      // this.authsrv
+      //   .register(user)
+      //   .pipe(
+      //     takeUntil(this.destroyed$),
+      //     catchError((err) => {
+      //       this.registerError =
+      //         err?.error?.message || 'Errore di registrazione';
+      //       this.snackBar.open(this.registerError, 'Chiudi', {
+      //         duration: 3000,
+      //       });
+      //       return throwError(() => err);
+      //     })
+      //   )
+      //   .subscribe(() => {
+      //     this.snackBar.open('Registrazione completata!', 'Chiudi', {
+      //       duration: 3000,
+      //     });
+      //     this.router.navigate(['/login']);
+      //   });
+
+      // this.snackBar.open('Registrazione completata!', 'Chiudi', {
+      //   duration: 3000,
+      // });
+      // this.router.navigate(['/login']);
+    } else {
+      this.snackBar.open('Controlla tutti i campi obbligatori', 'Chiudi', {
+        duration: 3000,
+      });
+    }
+  }
+
+  //OAuth methods
   registerWithGoogle(): void {
     window.location.href = `${environment.googleAuthLink}`;
   }
@@ -179,10 +235,5 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   gitHubSVG(pixel: number): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(gitHubSVG(pixel));
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 }

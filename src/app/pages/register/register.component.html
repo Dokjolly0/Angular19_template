@@ -4,7 +4,7 @@
       <mat-card-title>Registrati</mat-card-title>
     </mat-card-header>
 
-    <mat-card-content>
+    <mat-card-content class="register-content">
       <form [formGroup]="registerForm" (ngSubmit)="register()">
         <div class="form-grid">
           <mat-form-field appearance="outline" class="form-field">
@@ -24,15 +24,8 @@
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Password</mat-label>
-            <input
-              matInput
-              formControlName="password"
-              [type]="hidePassword ? 'password' : 'text'"
-              required
-            />
-            <mat-icon matSuffix (click)="togglePasswordVisibility()"
-              >visibility</mat-icon
-            >
+            <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" required />
+            <mat-icon matSuffix (click)="togglePasswordVisibility()">visibility</mat-icon>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
@@ -44,9 +37,7 @@
               [type]="hideConfirmPassword ? 'password' : 'text'"
               required
             />
-            <mat-icon matSuffix (click)="togglePasswordVisibility(true)"
-              >visibility</mat-icon
-            >
+            <mat-icon matSuffix (click)="togglePasswordVisibility(true)">visibility</mat-icon>
             <mat-error *ngIf="registerForm.hasError('passwordMismatch')">
               Le password non corrispondono
             </mat-error>
@@ -54,15 +45,15 @@
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Data di nascita (opzionale)</mat-label>
-            <input matInput formControlName="birthDate" type="date" />
+            <input matInput [matDatepicker]="picker" formControlName="birthDate" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Genere (opzionale)</mat-label>
             <mat-select formControlName="gender">
-              <mat-option *ngFor="let g of genderOptions" [value]="g">{{
-                g
-              }}</mat-option>
+              <mat-option *ngFor="let g of genderOptions" [value]="g">{{ g }}</mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -77,16 +68,12 @@
             <button
               mat-icon-button
               matSuffix
-              [matTooltip]="
-                uploadedFileName ? 'Immagine caricata' : 'Carica immagine'
-              "
+              [matTooltip]="uploadedFileName ? 'Immagine caricata' : 'Carica immagine'"
               [color]="uploadedFileName ? 'primary' : ''"
               (click)="openImageDialog()"
               type="button"
             >
-              <mat-icon>{{
-                uploadedFileName ? "check_circle" : "cloud_upload"
-              }}</mat-icon>
+              <mat-icon>{{ uploadedFileName ? "check_circle" : "cloud_upload" }}</mat-icon>
             </button>
           </mat-form-field>
 
@@ -95,22 +82,10 @@
           </div> -->
         </div>
 
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          class="full-width"
-        >
-          Registrati
-        </button>
+        <button mat-raised-button color="primary" type="submit" class="full-width">Registrati</button>
 
         <div class="auth-options">
-          <a
-            routerLink="/login"
-            mat-stroked-button
-            color="accent"
-            class="full-width"
-          >
+          <a routerLink="/login" mat-stroked-button color="accent" class="full-width">
             Hai già un account? Accedi
           </a>
 

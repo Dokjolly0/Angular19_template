@@ -1,9 +1,5 @@
 import { Component, Inject, inject } from '@angular/core';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-  MatDialogModule,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -73,6 +69,14 @@ export class ImageUploadDialog {
       return;
     }
     this.dialogRef.close(this.previewImage);
+  }
+
+  delete(): void {
+    this.previewImage = null;
+    this.selectedFile = null;
+    this.url = '';
+    this.fileError = null;
+    this.dialogRef.close('delete');
   }
 
   close(): void {
